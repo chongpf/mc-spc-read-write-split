@@ -1,0 +1,91 @@
+
+server:
+  port: 9050
+spring:
+  application:
+    name: mcspcreadwritesplit
+  redis:
+    host: localhost
+    port: 6739
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+  jpa:
+    database: mysql
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+#  datasource:
+#    driver-class-name: com.mysql.jdbc.Driver
+#    url: jdbc:mysql://localhost:3306/mcspcsales?useUnicode=true&character_set_server=utf8mb4&useSSL=false&serverTimezone=GMT%2B8
+#    username: root
+#    password: root
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/,http://localhost:8762/eureka/
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${server.port}
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: mcspcreadwritesplit.entity
+
+logging:
+  file:
+    name: C:\work\jusstech\dev\chongstudy\log\mc-spc-readwrite-split.log
+    max-history: 7
+    max-size: 10MB
+  level:
+    root: info
+    com.chong.mcspcgoodsservice.dao: debug
+feign:
+  hystrix:
+    enabled: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+sharding:
+  jdbc:
+    dataSource:
+      names: masterdb,slavedb01,slavedb02
+      masterdb:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driverClassName: com.mysql.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/mcspcsales?useUnicode=true&character_set_server=utf8mb4&useSSL=false&serverTimezone=GMT%2B8
+        username: root
+        password: root
+        maxPoolSize: 20
+      slavedb01:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driverClassName: com.mysql.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/mcspcsales1?useUnicode=true&character_set_server=utf8mb4&useSSL=false&serverTimezone=GMT%2B8
+        username: root
+        password: root
+        maxPoolSize: 20
+      slavedb02:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driverClassName: com.mysql.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/mcspcsales2?useUnicode=true&character_set_server=utf8mb4&useSSL=false&serverTimezone=GMT%2B8
+        username: root
+        password: root
+        maxPoolSize: 20
+    config:
+      masterslave:
+        load-balance-algorithm-type: round_robin # random:Ëæ»ú round_robin:ÂÖÑ¯
+        name: mcspcsalesMaster1Slave2
+        master-data-source-name: masterdb
+        slave-data-source-names: slavedb01,slavedb02
+    props:
+      sql:
+        show: true
