@@ -4,8 +4,6 @@ import com.chong.common.annotation.MasterSelect;
 import com.chong.common.idworker.IdWorker;
 import com.chong.mcspcreadwritesplit.entity.BizMember;
 import com.chong.mcspcreadwritesplit.repository.MemberRepository;
-import io.shardingsphere.api.HintManager;
-import io.shardingsphere.core.hint.HintManagerHolder;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,14 +25,7 @@ public class MemberRepositoryService {
     @MasterSelect
     public List<BizMember> getMemberList() {
         List<BizMember> list = null;
-//        try {
-//            HintManager.getInstance().setMasterRouteOnly();
-            list = memberRepository.findAll();
-//        }catch (Exception ex) {
-//            ex.printStackTrace();
-//        }finally {
-//            HintManagerHolder.clear();
-//        }
+        list = memberRepository.findAll();
         return list;
     }
 
